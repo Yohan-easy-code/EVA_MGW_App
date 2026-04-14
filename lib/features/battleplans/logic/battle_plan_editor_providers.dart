@@ -8,22 +8,25 @@ import 'package:mgw_eva/shared/providers/repositories_provider.dart';
 @immutable
 class BattlePlanEditorArgs {
   const BattlePlanEditorArgs({
+    required this.battlePlanId,
     required this.battlePlanName,
     required this.mapAssetPath,
   });
 
+  final int? battlePlanId;
   final String battlePlanName;
   final String mapAssetPath;
 
   @override
   bool operator ==(Object other) {
     return other is BattlePlanEditorArgs &&
+        other.battlePlanId == battlePlanId &&
         other.battlePlanName == battlePlanName &&
         other.mapAssetPath == mapAssetPath;
   }
 
   @override
-  int get hashCode => Object.hash(battlePlanName, mapAssetPath);
+  int get hashCode => Object.hash(battlePlanId, battlePlanName, mapAssetPath);
 }
 
 class BattlePlanEditorSession {
@@ -44,8 +47,8 @@ final battlePlanEditorSessionProvider = FutureProvider.autoDispose
       final mapAssetRepository = ref.watch(mapAssetRepositoryProvider);
       final battlePlanRepository = ref.watch(battlePlanRepositoryProvider);
       debugPrint(
-        '[BattlePlanEditorSession] route name="${args.battlePlanName}" '
-        'mapPath="${args.mapAssetPath}"',
+        '[BattlePlanEditorSession] route id=${args.battlePlanId} '
+        'name="${args.battlePlanName}" mapPath="${args.mapAssetPath}"',
       );
 
       final MapAsset? mapAsset = await mapAssetRepository
@@ -59,14 +62,15 @@ final battlePlanEditorSessionProvider = FutureProvider.autoDispose
         throw StateError('Map asset not found for path: ${args.mapAssetPath}');
       }
 
-      final BattlePlan? battlePlan = await battlePlanRepository
-          .getBattlePlanByNameAndMapId(
-            name: args.battlePlanName,
-            mapId: mapAsset.id,
-          );
+      BattlePlan? battlePlan = args.battlePlanId == null
+          ? await battlePlanRepository.getBattlePlanByNameAndMapId(
+              name: args.battlePlanName,
+              mapId: mapAsset.id,
+            )
+          : await battlePlanRepository.getBattlePlanById(args.battlePlanId!);
       debugPrint(
         '[BattlePlanEditorSession] battlePlan lookup='
-        '${battlePlan == null ? 'null' : '${battlePlan.id}:${battlePlan.name}'}',
+        '${battlePlan == null ? 'null' : '${battlePlan.id}:${battlePlan.name} mapId=${battlePlan.mapId}'}',
       );
 
       if (battlePlan == null) {
@@ -76,12 +80,33 @@ final battlePlanEditorSessionProvider = FutureProvider.autoDispose
         );
       }
 
+      if (battlePlan.mapId != mapAsset.id) {
+        final MapAsset? previousMapAsset = await mapAssetRepository
+            .getMapAssetById(battlePlan.mapId);
+        debugPrint(
+          '[BattlePlanEditorSession] update same battlePlanId=${battlePlan.id} '
+          'oldMap="${previousMapAsset?.imagePath ?? battlePlan.mapId}" '
+          'newMap="${mapAsset.imagePath}"',
+        );
+        await battlePlanRepository.updateBattlePlan(
+          battlePlan.copyWith(mapId: mapAsset.id),
+        );
+        battlePlan = await battlePlanRepository.getBattlePlanById(
+          battlePlan.id,
+        );
+        debugPrint(
+          '[BattlePlanEditorSession] update confirmed battlePlanId=${battlePlan?.id} '
+          'mapId=${battlePlan?.mapId}',
+        );
+      }
+      final BattlePlan resolvedBattlePlan = battlePlan!;
+
       await ref
           .read(battlePlanTimelineServiceProvider)
-          .ensureInitialTimeline(battlePlan.id);
+          .ensureInitialTimeline(resolvedBattlePlan.id);
 
       return BattlePlanEditorSession(
-        battlePlan: battlePlan,
+        battlePlan: resolvedBattlePlan,
         mapAsset: mapAsset,
       );
     });
