@@ -53,5 +53,39 @@ void main() {
       expect(find.text('Ouvrir l\'editeur'), findsOneWidget);
       expect(find.text('Nouveau'), findsOneWidget);
     });
+
+    testWidgets('keeps the battleplan list empty until manual creation', (
+      WidgetTester tester,
+    ) async {
+      const List<MapAsset> maps = <MapAsset>[
+        MapAsset(
+          id: 1,
+          name: 'ATLANTIS',
+          logicalMapName: 'ATLANTIS',
+          floorNumber: 1,
+          imagePath: AssetPaths.mapAtlantisFloor1,
+          width: 1600,
+          height: 900,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const BattlePlansScreen(),
+          overrides: [
+            battlePlanRepositoryProvider.overrideWith(
+              (Ref ref) => const FakeBattlePlanRepository(<BattlePlan>[]),
+            ),
+            mapAssetRepositoryProvider.overrideWith(
+              (Ref ref) => const FakeMapAssetRepository(maps),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Aucun battleplan pour le moment.'), findsOneWidget);
+      expect(find.text('Creer un battleplan'), findsOneWidget);
+    });
   });
 }

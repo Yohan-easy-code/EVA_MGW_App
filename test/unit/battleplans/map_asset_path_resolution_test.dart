@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mgw_eva/core/constants/asset_paths.dart';
 import 'package:mgw_eva/data/local/db/app_database.dart';
@@ -76,18 +77,53 @@ void main() {
       expect(mapAsset!.imagePath, AssetPaths.mapTheCliffFloor2);
     });
 
-    test('rejects deprecated assets/maps legacy paths', () async {
-      final database = createTestDatabase();
-      addTearDown(database.close);
+    test(
+      'resolves deprecated assets/maps legacy paths to canonical assets',
+      () async {
+        final database = createTestDatabase();
+        addTearDown(database.close);
 
-      await AppSeedService(database).seedIfNeeded();
+        await AppSeedService(database).seedIfNeeded();
 
-      final repository = DriftMapAssetRepository(database);
-      final mapAsset = await repository.getMapAssetByImagePath(
-        'assets/maps/helios/floor_1.png',
-      );
+        final repository = DriftMapAssetRepository(database);
+        final mapAsset = await repository.getMapAssetByImagePath(
+          'assets/maps/helios/floor_1.png',
+        );
 
-      expect(mapAsset, isNull);
-    });
+        expect(mapAsset, isNotNull);
+        expect(mapAsset!.imagePath, AssetPaths.mapHeliosFloor1);
+      },
+    );
+
+    test(
+      'migrates legacy database image paths to canonical assets on seed',
+      () async {
+        final database = createTestDatabase();
+        addTearDown(database.close);
+
+        await database
+            .into(database.mapAssets)
+            .insert(
+              MapAssetsCompanion.insert(
+                name: 'HELIOS',
+                logicalMapName: const Value<String>('HELIOS'),
+                floorNumber: const Value<int>(2),
+                imagePath: 'assets/maps/helios/floor_2.png',
+                width: 1600,
+                height: 900,
+              ),
+            );
+
+        await AppSeedService(database).seedIfNeeded();
+
+        final rows = await database.select(database.mapAssets).get();
+        final migratedRow = rows.singleWhere(
+          (MapAsset row) =>
+              row.logicalMapName == 'HELIOS' && row.floorNumber == 2,
+        );
+
+        expect(migratedRow.imagePath, AssetPaths.mapHeliosFloor2);
+      },
+    );
   });
 }
