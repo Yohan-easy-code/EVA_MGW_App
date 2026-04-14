@@ -1,0 +1,13 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="700" rx="36" fill="#10161D"/>
+  <rect x="62" y="62" width="1076" height="576" rx="30" fill="#17212B" stroke="#2A3743" stroke-width="4"/>
+  <rect x="200" y="312" width="500" height="34" rx="14" fill="#8FB4FF"/>
+  <rect x="690" y="300" width="180" height="22" rx="10" fill="#C7D9FF"/>
+  <path d="M390 346L320 460H380L446 346H390Z" fill="#294050"/>
+  <path d="M560 346L612 504H692L660 346H560Z" fill="#36546B"/>
+  <circle cx="886" cy="370" r="74" fill="#27D3C3" fill-opacity="0.12" stroke="#27D3C3" stroke-width="6"/>
+  <path d="M886 330V410" stroke="#27D3C3" stroke-width="10" stroke-linecap="round"/>
+  <path d="M846 370H926" stroke="#27D3C3" stroke-width="10" stroke-linecap="round"/>
+  <text x="600" y="560" fill="#E4EEF7" font-size="48" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="700">Weapon Placeholder</text>
+  <text x="600" y="612" fill="#8EA4B6" font-size="26" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">Local fallback visual for missing or empty weapon assets</text>
+</svg>

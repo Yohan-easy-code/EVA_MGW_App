@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <size android:width="72dp" android:height="72dp" />
+            <stroke android:width="4dp" android:color="@color/ic_launcher_monochrome" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <item android:gravity="center">
+        <shape android:shape="rectangle">
+            <size android:width="6dp" android:height="46dp" />
+            <solid android:color="@color/ic_launcher_monochrome" />
+        </shape>
+    </item>
+    <item android:gravity="center">
+        <rotate android:fromDegrees="90">
+            <shape android:shape="rectangle">
+                <size android:width="6dp" android:height="46dp" />
+                <solid android:color="@color/ic_launcher_monochrome" />
+            </shape>
+        </rotate>
+    </item>
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <size android:width="20dp" android:height="20dp" />
+            <solid android:color="@color/ic_launcher_monochrome" />
+        </shape>
+    </item>
+</layer-list>

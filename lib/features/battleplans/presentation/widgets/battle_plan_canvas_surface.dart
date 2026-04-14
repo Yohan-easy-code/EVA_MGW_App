@@ -17,18 +17,13 @@ class BattlePlanCanvasSurface extends StatelessWidget {
   final BattlePlanCanvasViewport viewport;
   final VoidCallback onBackgroundTap;
 
-  static const bool _debugMapChrome = bool.fromEnvironment(
-    'DEBUG_BATTLEPLAN_MAP_CHROME',
-    defaultValue: true,
-  );
-
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     debugPrint(
       '[BattlePlanCanvasSurface] map="${mapAsset.imagePath}" '
       'rect=${viewport.mapRect} rendered=${viewport.renderedMapSize} '
-      'layers=debug-bg>image>grid>tag',
+      'layers=map>grid>tag',
     );
 
     return GestureDetector(
@@ -54,12 +49,6 @@ class BattlePlanCanvasSurface extends StatelessWidget {
                           end: Alignment.bottomRight,
                           colors: <Color>[Color(0xFF10314A), Color(0xFF1E5F3F)],
                         ),
-                        border: _debugMapChrome
-                            ? Border.all(
-                                color: const Color(0xFFFFC857),
-                                width: 2,
-                              )
-                            : null,
                       ),
                     ),
                   ),
@@ -67,12 +56,6 @@ class BattlePlanCanvasSurface extends StatelessWidget {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
-                        border: _debugMapChrome
-                            ? Border.all(
-                                color: const Color(0xFF12E0A0),
-                                width: 2,
-                              )
-                            : null,
                       ),
                       child: AppAssetView(
                         key: ValueKey<String>(

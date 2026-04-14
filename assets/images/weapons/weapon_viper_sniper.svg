@@ -1,0 +1,10 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="600" rx="36" fill="#121418"/>
+  <rect x="120" y="274" width="900" height="30" rx="12" fill="#D84F68"/>
+  <rect x="1000" y="266" width="120" height="18" rx="8" fill="#FF9BAB"/>
+  <rect x="410" y="232" width="170" height="38" rx="14" fill="#3C1F29"/>
+  <circle cx="500" cy="250" r="34" fill="#FF9BAB" fill-opacity="0.2" stroke="#FF9BAB" stroke-width="4"/>
+  <path d="M352 304L290 420H340L406 304H352Z" fill="#3C1F29"/>
+  <path d="M682 304L724 438H780L760 304H682Z" fill="#5A2D39"/>
+  <text x="600" y="525" fill="#FFD8DE" font-size="36" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="700">Viper One</text>
+</svg>

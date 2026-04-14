@@ -1,0 +1,10 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#10161D"/>
+  <rect x="56" y="56" width="1488" height="788" rx="40" fill="#15212B" stroke="#2A3743" stroke-width="4"/>
+  <path d="M120 780L470 470L690 650L1040 300L1480 680" stroke="#3E5365" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="470" cy="470" r="44" fill="#27D3C3" fill-opacity="0.18" stroke="#27D3C3" stroke-width="6"/>
+  <path d="M1080 170V330" stroke="#8FB4FF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M1000 250H1160" stroke="#8FB4FF" stroke-width="18" stroke-linecap="round"/>
+  <text x="800" y="420" fill="#E4EEF7" font-size="54" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="700">Map Placeholder</text>
+  <text x="800" y="480" fill="#8EA4B6" font-size="28" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">Local fallback visual for missing or empty map assets</text>
+</svg>

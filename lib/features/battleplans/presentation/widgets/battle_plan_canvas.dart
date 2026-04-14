@@ -57,7 +57,6 @@ class BattlePlanCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final double mapWidth = mapAsset.width.toDouble();
     final double mapHeight = mapAsset.height.toDouble();
 
@@ -70,7 +69,6 @@ class BattlePlanCanvas extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: <Color>[Color(0xFF091016), Color(0xFF111A24)],
           ),
-          border: Border.all(color: colorScheme.outlineVariant.withAlpha(140)),
         ),
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
