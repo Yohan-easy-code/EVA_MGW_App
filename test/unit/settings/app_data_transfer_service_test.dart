@@ -93,5 +93,119 @@ void main() {
       expect(weapons.single['id'], weaponId);
       expect(weapons.single['name'], 'Helios AR');
     });
+
+    test(
+      'resetDatabase clears battleplans and reseeds only catalogue data',
+      () async {
+        final database = createTestDatabase();
+        addTearDown(database.close);
+
+        final seedService = AppSeedService(database);
+        final service = AppDataTransferService(database, seedService);
+
+        await seedService.seedIfNeeded();
+
+        final int mapId =
+            (await database.select(database.mapAssets).get()).first.id;
+        final int battlePlanId = await database
+            .into(database.battlePlans)
+            .insert(
+              BattlePlansCompanion.insert(name: 'Legacy Plan', mapId: mapId),
+            );
+        final int stepId = await database
+            .into(database.battlePlanSteps)
+            .insert(
+              BattlePlanStepsCompanion.insert(
+                battlePlanId: battlePlanId,
+                title: 'Etape 1',
+                orderIndex: 0,
+              ),
+            );
+        final int elementId = await database
+            .into(database.planElements)
+            .insert(
+              PlanElementsCompanion.insert(
+                battlePlanId: battlePlanId,
+                type: 'marker',
+                x: 120,
+                y: 240,
+                width: 42,
+                height: 42,
+                color: 0xFFFFB84D,
+              ),
+            );
+        await database
+            .into(database.battlePlanStepElementStates)
+            .insert(
+              BattlePlanStepElementStatesCompanion.insert(
+                stepId: stepId,
+                planElementId: elementId,
+                x: 120,
+                y: 240,
+                width: 42,
+                height: 42,
+                color: 0xFFFFB84D,
+              ),
+            );
+
+        await service.resetDatabase();
+
+        expect(await database.select(database.battlePlans).get(), isEmpty);
+        expect(await database.select(database.planElements).get(), isEmpty);
+        expect(await database.select(database.battlePlanSteps).get(), isEmpty);
+        expect(
+          await database.select(database.battlePlanStepElementStates).get(),
+          isEmpty,
+        );
+        expect(await database.select(database.mapAssets).get(), hasLength(6));
+        expect(await database.select(database.weapons).get(), isNotEmpty);
+      },
+    );
+
+    test(
+      'purgeBattlePlans removes local plans and keeps seeded maps',
+      () async {
+        final database = createTestDatabase();
+        addTearDown(database.close);
+
+        final seedService = AppSeedService(database);
+        final service = AppDataTransferService(database, seedService);
+
+        await seedService.seedIfNeeded();
+
+        final int mapId =
+            (await database.select(database.mapAssets).get()).first.id;
+        final int battlePlanId = await database
+            .into(database.battlePlans)
+            .insert(
+              BattlePlansCompanion.insert(name: 'Plan Dev', mapId: mapId),
+            );
+        await database
+            .into(database.planElements)
+            .insert(
+              PlanElementsCompanion.insert(
+                battlePlanId: battlePlanId,
+                type: 'marker',
+                x: 10,
+                y: 20,
+                width: 42,
+                height: 42,
+                color: 0xFFFFB84D,
+              ),
+            );
+
+        await service.purgeBattlePlans();
+
+        expect(await database.select(database.battlePlans).get(), isEmpty);
+        expect(await database.select(database.planElements).get(), isEmpty);
+        expect(await database.select(database.battlePlanSteps).get(), isEmpty);
+        expect(
+          await database.select(database.battlePlanStepElementStates).get(),
+          isEmpty,
+        );
+        expect(await database.select(database.mapAssets).get(), hasLength(6));
+        expect(await database.select(database.weapons).get(), isNotEmpty);
+      },
+    );
   });
 }
