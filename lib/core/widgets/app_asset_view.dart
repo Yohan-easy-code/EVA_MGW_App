@@ -70,51 +70,56 @@ class AppAssetView extends StatelessWidget {
             'path="$normalizedPath" constraints='
             '${constraints.maxWidth}x${constraints.maxHeight}',
           );
-          return ColoredBox(
-            color: Colors.black,
-            child: Image.asset(
-              normalizedPath,
-              fit: fit,
-              width: width,
-              height: height,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.medium,
-              isAntiAlias: true,
-              gaplessPlayback: true,
-              frameBuilder:
-                  (
-                    BuildContext context,
-                    Widget child,
-                    int? frame,
-                    bool wasSynchronouslyLoaded,
-                  ) {
-                    debugPrint(
-                      '[AppAssetView] raster frame kind=${assetKind.name} '
-                      'path="$normalizedPath" frame=$frame '
-                      'sync=$wasSynchronouslyLoaded',
-                    );
-                    return AnimatedOpacity(
-                      duration: const Duration(milliseconds: 120),
-                      opacity: frame == null && !wasSynchronouslyLoaded ? 0 : 1,
-                      child: child,
-                    );
-                  },
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stackTrace) {
-                    debugPrint(
-                      '[AppAssetView] raster load failed kind=${assetKind.name} '
-                      'path="$normalizedPath" error=$error',
-                    );
-                    return _AssetFallbackView(
-                      assetKind: assetKind,
-                      title: assetKind.errorTitle,
-                      subtitle: assetKind.errorSubtitle,
-                      borderRadius: borderRadius,
-                      width: width,
-                      height: height,
-                    );
-                  },
-            ),
+          return Image(
+            image: AssetImage(normalizedPath),
+            fit: fit,
+            width: width,
+            height: height,
+            alignment: Alignment.center,
+            filterQuality: FilterQuality.high,
+            isAntiAlias: true,
+            frameBuilder:
+                (
+                  BuildContext context,
+                  Widget child,
+                  int? frame,
+                  bool wasSynchronouslyLoaded,
+                ) {
+                  debugPrint(
+                    '[AppAssetView] raster frame kind=${assetKind.name} '
+                    'path="$normalizedPath" frame=$frame '
+                    'sync=$wasSynchronouslyLoaded',
+                  );
+                  return child;
+                },
+            loadingBuilder:
+                (
+                  BuildContext context,
+                  Widget child,
+                  ImageChunkEvent? loadingProgress,
+                ) {
+                  debugPrint(
+                    '[AppAssetView] raster loading kind=${assetKind.name} '
+                    'path="$normalizedPath" progress='
+                    '${loadingProgress?.cumulativeBytesLoaded ?? 'done'}',
+                  );
+                  return child;
+                },
+            errorBuilder:
+                (BuildContext context, Object error, StackTrace? stackTrace) {
+                  debugPrint(
+                    '[AppAssetView] raster load failed kind=${assetKind.name} '
+                    'path="$normalizedPath" error=$error',
+                  );
+                  return _AssetFallbackView(
+                    assetKind: assetKind,
+                    title: assetKind.errorTitle,
+                    subtitle: assetKind.errorSubtitle,
+                    borderRadius: borderRadius,
+                    width: width,
+                    height: height,
+                  );
+                },
           );
         },
       );

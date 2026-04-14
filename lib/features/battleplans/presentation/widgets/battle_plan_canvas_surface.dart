@@ -17,12 +17,18 @@ class BattlePlanCanvasSurface extends StatelessWidget {
   final BattlePlanCanvasViewport viewport;
   final VoidCallback onBackgroundTap;
 
+  static const bool _debugMapChrome = bool.fromEnvironment(
+    'DEBUG_BATTLEPLAN_MAP_CHROME',
+    defaultValue: true,
+  );
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     debugPrint(
       '[BattlePlanCanvasSurface] map="${mapAsset.imagePath}" '
-      'rect=${viewport.mapRect} rendered=${viewport.renderedMapSize}',
+      'rect=${viewport.mapRect} rendered=${viewport.renderedMapSize} '
+      'layers=debug-bg>image>grid>tag',
     );
 
     return GestureDetector(
@@ -41,25 +47,54 @@ class BattlePlanCanvasSurface extends StatelessWidget {
               child: Stack(
                 children: <Widget>[
                   Positioned.fill(
-                    child: CustomPaint(
-                      painter: BattlePlanGridPainter(
-                        lineColor: colorScheme.outlineVariant.withAlpha(22),
-                        boldLineColor: colorScheme.outlineVariant.withAlpha(52),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: <Color>[Color(0xFF10314A), Color(0xFF1E5F3F)],
+                        ),
+                        border: _debugMapChrome
+                            ? Border.all(
+                                color: const Color(0xFFFFC857),
+                                width: 2,
+                              )
+                            : null,
                       ),
                     ),
                   ),
                   Positioned.fill(
-                    child: Padding(
-                      padding: EdgeInsets.all(viewport.scale > 0.75 ? 4 : 3),
-                      child: ClipRRect(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
-                        child: AppAssetView(
-                          key: ValueKey<String>(
-                            '${mapAsset.id}:${mapAsset.imagePath}',
+                        border: _debugMapChrome
+                            ? Border.all(
+                                color: const Color(0xFF12E0A0),
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: AppAssetView(
+                        key: ValueKey<String>(
+                          '${mapAsset.id}:${mapAsset.imagePath}',
+                        ),
+                        assetPath: mapAsset.imagePath,
+                        assetKind: AppAssetKind.map,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Padding(
+                        padding: EdgeInsets.all(viewport.scale > 0.75 ? 4 : 3),
+                        child: CustomPaint(
+                          painter: BattlePlanGridPainter(
+                            lineColor: colorScheme.outlineVariant.withAlpha(22),
+                            boldLineColor: colorScheme.outlineVariant.withAlpha(
+                              52,
+                            ),
                           ),
-                          assetPath: mapAsset.imagePath,
-                          assetKind: AppAssetKind.map,
-                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
