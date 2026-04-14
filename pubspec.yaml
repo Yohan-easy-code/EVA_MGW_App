@@ -40,6 +40,14 @@ flutter:
     - assets/logo.png
     - assets/images/maps/atlantis/
     - assets/images/maps/helios/
+    - assets/images/maps/lunar/
+    - assets/images/maps/polaris/
+    - assets/images/maps/silva/
+    - assets/images/maps/horizon/
+    - assets/images/maps/outlaw/
+    - assets/images/maps/engine/
+    - assets/images/maps/ceres/
+    - assets/images/maps/artefact/
     - assets/images/maps/the_cliff/
     - assets/images/placeholders/
     - assets/images/weapons/

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mgw_eva/features/battleplans/domain/entities/battle_plan.dart';
@@ -115,3 +118,13 @@ final battlePlanEditorMapAssetsProvider =
     StreamProvider.autoDispose<List<MapAsset>>((Ref ref) {
       return ref.watch(mapAssetRepositoryProvider).watchMapAssets();
     });
+
+final battlePlanMapAssetPathsProvider = FutureProvider.autoDispose<Set<String>>(
+  (Ref ref) async {
+    final String manifest = await rootBundle.loadString('AssetManifest.json');
+    final Map<String, dynamic> decodedManifest =
+        jsonDecode(manifest) as Map<String, dynamic>;
+
+    return decodedManifest.keys.toSet();
+  },
+);

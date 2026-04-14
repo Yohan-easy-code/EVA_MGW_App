@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/services.dart';
 import 'package:mgw_eva/core/assets/map_asset_path_resolver.dart';
 import 'package:mgw_eva/data/local/db/app_database.dart';
 import 'package:mgw_eva/data/local/seed/default_map_assets.dart';
@@ -23,6 +24,7 @@ class AppSeedService {
   }
 
   Future<void> _syncMapAssets() async {
+    final List<MapAssetSeed> defaultMapAssets = await _loadDefaultMapAssets();
     final List<MapAsset> existingMapAssets = await _database
         .select(_database.mapAssets)
         .get();
@@ -79,7 +81,7 @@ class AppSeedService {
           );
     }
 
-    await _removeObsoleteSeedMapAssets();
+    await _removeObsoleteSeedMapAssets(defaultMapAssets);
   }
 
   Future<void> _seedWeaponsIfNeeded() async {
@@ -299,7 +301,23 @@ class AppSeedService {
     }
   }
 
-  Future<void> _removeObsoleteSeedMapAssets() async {
+  Future<List<MapAssetSeed>> _loadDefaultMapAssets() async {
+    try {
+      final String assetManifest = await rootBundle.loadString(
+        'AssetManifest.json',
+      );
+      final Map<String, dynamic> decodedManifest =
+          jsonDecode(assetManifest) as Map<String, dynamic>;
+
+      return buildDefaultMapAssets(decodedManifest.keys);
+    } catch (_) {
+      return buildDefaultMapAssets(fallbackMapAssetPaths);
+    }
+  }
+
+  Future<void> _removeObsoleteSeedMapAssets(
+    List<MapAssetSeed> defaultMapAssets,
+  ) async {
     final Set<String> seedMapKeys = defaultMapAssets
         .map<String>(
           (MapAssetSeed mapAsset) => _mapFloorKey(

@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgw_eva/core/constants/asset_paths.dart';
 import 'package:mgw_eva/data/local/db/app_database.dart';
 import 'package:mgw_eva/data/local/seed/app_seed_service.dart';
 import 'package:mgw_eva/features/battleplans/data/repositories/drift_map_asset_repository.dart';
@@ -8,29 +7,45 @@ import 'package:mgw_eva/features/battleplans/data/repositories/drift_map_asset_r
 import '../../helpers/test_database.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('Map asset path resolution', () {
-    test('seeds the six canonical floor assets', () async {
-      final database = createTestDatabase();
-      addTearDown(database.close);
+    test(
+      'seeds every available floor asset under assets/images/maps',
+      () async {
+        final database = createTestDatabase();
+        addTearDown(database.close);
 
-      await AppSeedService(database).seedIfNeeded();
+        await AppSeedService(database).seedIfNeeded();
 
-      final rows = await database.select(database.mapAssets).get();
-      final imagePaths = rows.map((MapAsset row) => row.imagePath).toSet();
+        final rows = await database.select(database.mapAssets).get();
+        final imagePaths = rows.map((MapAsset row) => row.imagePath).toSet();
 
-      expect(rows, hasLength(6));
-      expect(
-        imagePaths,
-        containsAll(<String>{
-          AssetPaths.mapAtlantisFloor1,
-          AssetPaths.mapAtlantisFloor2,
-          AssetPaths.mapHeliosFloor1,
-          AssetPaths.mapHeliosFloor2,
-          AssetPaths.mapTheCliffFloor1,
-          AssetPaths.mapTheCliffFloor2,
-        }),
-      );
-    });
+        expect(rows, hasLength(17));
+        expect(
+          imagePaths,
+          containsAll(<String>{
+            'assets/images/maps/artefact/floor_1.png',
+            'assets/images/maps/artefact/floor_2.png',
+            'assets/images/maps/atlantis/floor_1.png',
+            'assets/images/maps/atlantis/floor_2.png',
+            'assets/images/maps/ceres/floor_1.png',
+            'assets/images/maps/engine/floor_1.png',
+            'assets/images/maps/helios/floor_1.png',
+            'assets/images/maps/helios/floor_2.png',
+            'assets/images/maps/horizon/floor_1.png',
+            'assets/images/maps/horizon/floor_2.png',
+            'assets/images/maps/lunar/floor_1.png',
+            'assets/images/maps/outlaw/floor_1.png',
+            'assets/images/maps/polaris/floor_1.png',
+            'assets/images/maps/polaris/floor_2.png',
+            'assets/images/maps/silva/floor_1.png',
+            'assets/images/maps/the_cliff/floor_1.png',
+            'assets/images/maps/the_cliff/floor_2.png',
+          }),
+        );
+      },
+    );
 
     test('finds Atlantis floor 2 from the canonical route path', () async {
       final database = createTestDatabase();
@@ -40,14 +55,14 @@ void main() {
 
       final repository = DriftMapAssetRepository(database);
       final mapAsset = await repository.getMapAssetByImagePath(
-        AssetPaths.mapAtlantisFloor2,
+        'assets/images/maps/atlantis/floor_2.png',
       );
 
       expect(mapAsset, isNotNull);
-      expect(mapAsset!.imagePath, AssetPaths.mapAtlantisFloor2);
+      expect(mapAsset!.imagePath, 'assets/images/maps/atlantis/floor_2.png');
     });
 
-    test('finds Helios floor 2 from the canonical route path', () async {
+    test('finds Lunar floor 1 from the canonical route path', () async {
       final database = createTestDatabase();
       addTearDown(database.close);
 
@@ -55,11 +70,11 @@ void main() {
 
       final repository = DriftMapAssetRepository(database);
       final mapAsset = await repository.getMapAssetByImagePath(
-        AssetPaths.mapHeliosFloor2,
+        'assets/images/maps/lunar/floor_1.png',
       );
 
       expect(mapAsset, isNotNull);
-      expect(mapAsset!.imagePath, AssetPaths.mapHeliosFloor2);
+      expect(mapAsset!.imagePath, 'assets/images/maps/lunar/floor_1.png');
     });
 
     test('finds The Cliff floor 2 from the canonical route path', () async {
@@ -70,11 +85,11 @@ void main() {
 
       final repository = DriftMapAssetRepository(database);
       final mapAsset = await repository.getMapAssetByImagePath(
-        AssetPaths.mapTheCliffFloor2,
+        'assets/images/maps/the_cliff/floor_2.png',
       );
 
       expect(mapAsset, isNotNull);
-      expect(mapAsset!.imagePath, AssetPaths.mapTheCliffFloor2);
+      expect(mapAsset!.imagePath, 'assets/images/maps/the_cliff/floor_2.png');
     });
 
     test(
@@ -87,11 +102,11 @@ void main() {
 
         final repository = DriftMapAssetRepository(database);
         final mapAsset = await repository.getMapAssetByImagePath(
-          'assets/maps/helios/floor_1.png',
+          'assets/maps/lunar/floor_1.png',
         );
 
         expect(mapAsset, isNotNull);
-        expect(mapAsset!.imagePath, AssetPaths.mapHeliosFloor1);
+        expect(mapAsset!.imagePath, 'assets/images/maps/lunar/floor_1.png');
       },
     );
 
@@ -122,7 +137,7 @@ void main() {
               row.logicalMapName == 'HELIOS' && row.floorNumber == 2,
         );
 
-        expect(migratedRow.imagePath, AssetPaths.mapHeliosFloor2);
+        expect(migratedRow.imagePath, 'assets/images/maps/helios/floor_2.png');
       },
     );
   });

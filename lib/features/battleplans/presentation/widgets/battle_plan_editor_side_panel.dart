@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mgw_eva/core/assets/map_floor_asset_catalog.dart';
 import 'package:mgw_eva/features/battleplans/domain/entities/battle_plan_step.dart';
 import 'package:mgw_eva/features/battleplans/domain/entities/map_asset.dart';
 import 'package:mgw_eva/features/battleplans/domain/entities/plan_element.dart';
@@ -97,6 +98,9 @@ class _BattlePlanEditorSidePanelState
   Widget build(BuildContext context) {
     final AsyncValue<List<MapAsset>> mapAssets = ref.watch(
       battlePlanEditorMapAssetsProvider,
+    );
+    final AsyncValue<Set<String>> mapAssetPaths = ref.watch(
+      battlePlanMapAssetPathsProvider,
     );
     final AsyncValue<List<BattlePlanStep>> steps = ref.watch(
       battlePlanStepsProvider(widget.battlePlanId),
@@ -207,14 +211,15 @@ class _BattlePlanEditorSidePanelState
                                   ),
                                 );
                               }),
-                              if (floorOptions.length > 1) ...<Widget>[
-                                const SizedBox(height: 4),
-                                _FloorSelector(
-                                  floors: floorOptions,
-                                  currentMapAsset: widget.currentMapAsset,
-                                  onSelectFloor: widget.onSelectMap,
-                                ),
-                              ],
+                              const SizedBox(height: 4),
+                              _FloorSelector(
+                                floors: floorOptions,
+                                availableAssetPaths:
+                                    mapAssetPaths.asData?.value ??
+                                    const <String>{},
+                                currentMapAsset: widget.currentMapAsset,
+                                onSelectFloor: widget.onSelectMap,
+                              ),
                             ],
                           );
                         },
@@ -548,18 +553,22 @@ class _MapTile extends StatelessWidget {
 class _FloorSelector extends StatelessWidget {
   const _FloorSelector({
     required this.floors,
+    required this.availableAssetPaths,
     required this.currentMapAsset,
     required this.onSelectFloor,
   });
 
   final List<MapAsset> floors;
+  final Set<String> availableAssetPaths;
   final MapAsset currentMapAsset;
   final ValueChanged<MapAsset> onSelectFloor;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
+    final Map<int, MapAsset> floorsByNumber = <int, MapAsset>{
+      for (final MapAsset floor in floors) floor.floorNumber: floor,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -573,19 +582,34 @@ class _FloorSelector extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: floors
-              .map((MapAsset floor) {
-                final bool isSelected = floor.id == currentMapAsset.id;
+          children: const <int>[1, 2]
+              .map((int floorNumber) {
+                final MapAsset? floor = floorsByNumber[floorNumber];
+                final bool isSelected =
+                    floor?.id == currentMapAsset.id ||
+                    currentMapAsset.floorNumber == floorNumber;
+                final bool hasFloorAsset = MapFloorAssetCatalog.hasFloorAsset(
+                  mapAsset: currentMapAsset,
+                  floorNumber: floorNumber,
+                  assetPaths: availableAssetPaths,
+                );
+                final bool isEnabled =
+                    floor != null &&
+                    (availableAssetPaths.isEmpty || hasFloorAsset);
                 return ChoiceChip(
-                  label: Text(floor.floorLabel),
+                  label: Text('Etage $floorNumber'),
                   selected: isSelected,
-                  onSelected: isSelected ? null : (_) => onSelectFloor(floor),
+                  onSelected: !isEnabled || isSelected || floor == null
+                      ? null
+                      : (_) => onSelectFloor(floor),
                   avatar: Icon(
                     isSelected
                         ? BattlePlanEditorIcons.active
                         : BattlePlanEditorIcons.layers,
                     size: BattlePlanEditorIcons.compactIconSize,
-                    color: isSelected
+                    color: !isEnabled
+                        ? colorScheme.onSurface.withAlpha(70)
+                        : isSelected
                         ? colorScheme.primary
                         : colorScheme.onSurfaceVariant,
                   ),
