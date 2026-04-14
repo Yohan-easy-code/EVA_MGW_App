@@ -74,7 +74,7 @@ class SettingsController extends Notifier<SettingsControllerState> {
     return _runBusy(() async {
       await ref.read(appDataTransferServiceProvider).purgeBattlePlans();
       return const SettingsActionResult.info(
-        'Battleplans locaux supprimes. Les cartes et armes locales sont conservees.',
+        'Battleplans locaux reinitialises. Les cartes et armes locales sont conservees.',
       );
     });
   }

@@ -115,7 +115,7 @@ class SettingsScreen extends ConsumerWidget {
                           foregroundColor: colorScheme.primary,
                         ),
                         icon: const Icon(Icons.delete_sweep_rounded),
-                        label: const Text('Purger les battleplans'),
+                        label: const Text('Reinitialiser les battleplans'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -268,12 +268,12 @@ class SettingsScreen extends ConsumerWidget {
           context: context,
           builder: (BuildContext context) {
             return const ResetDatabaseDialog(
-              title: 'Purger les battleplans',
+              title: 'Reinitialiser les battleplans',
               message:
                   'Cette action supprime uniquement les battleplans locaux, '
                   'leurs elements et leurs etapes. Les cartes et armes seedees '
                   'sont conservees.',
-              confirmLabel: 'Purger',
+              confirmLabel: 'Reinitialiser',
             );
           },
         ) ??
